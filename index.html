@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyCommerce – Diagnóstico Gratuito do Seu E-commerce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0f172a;
+      --navy-light: #1e293b;
+      --navy-mid: #162032;
+      --purple: #7c3aed;
+      --purple-light: #8b5cf6;
+      --purple-glow: #a78bfa;
+      --purple-dim: #4c1d95;
+      --white: #ffffff;
+      --gray: #94a3b8;
+      --gray-light: #cbd5e1;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND DECORATIONS ── */
+    .bg-blobs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.18;
+    }
+    .blob-1 { width: 600px; height: 600px; background: var(--purple); top: -200px; right: -150px; }
+    .blob-2 { width: 500px; height: 500px; background: #2563eb; bottom: -180px; left: -120px; }
+    .blob-3 { width: 300px; height: 300px; background: var(--purple-light); top: 50%; left: 40%; }
+
+    /* ── WRAPPER ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--purple-glow); }
+    .badge-header {
+      background: rgba(124,58,237,0.18);
+      border: 1px solid rgba(124,58,237,0.4);
+      color: var(--purple-glow);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+      padding: 64px 0 80px;
+    }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: 48px; padding: 40px 0 60px; }
+    }
+
+    .hero-left {}
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.35);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple-glow);
+      margin-bottom: 28px;
+    }
+    .tag-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+    h1 .highlight {
+      background: linear-gradient(135deg, var(--purple-light), var(--purple-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 17px;
+      color: var(--gray-light);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    /* ── TRUST PILLS ── */
+    .trust-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 44px;
+    }
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-light);
+      backdrop-filter: blur(8px);
+    }
+    .pill svg { flex-shrink: 0; }
+
+    /* ── BENEFITS LIST ── */
+    .benefits-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .benefit-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .benefit-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+    .benefit-text span {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 0 0 1px rgba(124,58,237,0.1), 0 32px 64px rgba(0,0,0,0.4);
+      position: sticky;
+      top: 24px;
+    }
+    @media (max-width: 768px) {
+      .form-card { padding: 28px 20px; position: static; }
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-light);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .form-group { margin-bottom: 18px; }
+
+    input, select {
+      width: 100%;
+      background: rgba(15,23,42,0.8);
+      border: 1.5px solid rgba(100,116,139,0.3);
+      border-radius: 12px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding: 13px 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input::placeholder { color: #475569; }
+    input:focus, select:focus {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
+    }
+    select { cursor: pointer; color: var(--white); }
+    select option { background: #1e293b; color: var(--white); }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 16px;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.45);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(124,58,237,0.55);
+    }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── STATES ── */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* Success */
+    .success-box {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: rgba(16,185,129,0.15);
+      border: 2px solid rgba(16,185,129,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 24px;
+      animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .success-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .success-msg {
+      font-size: 15px;
+      color: var(--gray-light);
+      line-height: 1.65;
+    }
+
+    /* Error */
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px;
+      color: #fca5a5;
+      font-size: 14px;
+      padding: 12px 16px;
+      margin-top: 14px;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── FORM HEADER ── */
+    .form-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .form-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .form-header p {
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    /* ── MICRO TRUST ── */
+    .micro-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #475569;
+      margin-top: 14px;
+    }
+
+    /* ── STATS SECTION ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    @media (max-width: 640px) { .stats { grid-template-columns: 1fr; gap: 12px; } }
+
+    .stat-card {
+      background: rgba(30,41,59,0.5);
+      border: 1px solid rgba(100,116,139,0.15);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple-light), var(--purple-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label { font-size: 13px; color: var(--gray); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(100,116,139,0.12);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: #475569;
+    }
+    footer a { color: var(--gray); text-decoration: none; }
+    footer a:hover { color: var(--purple-glow); }
+
+    /* ── UTILITY ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(124,58,237,0.3), transparent);
+      margin: 60px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Hey<span>Commerce</span></div>
+    <div class="badge-header">✦ Diagnóstico Gratuito</div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <div class="tag">
+        <span class="tag-dot"></span>
+        Vagas limitadas por semana
+      </div>
+
+      <h1>Descubra por que seu e-commerce <span class="highlight">não converte</span> como deveria</h1>
+
+      <p class="subtitle">
+        Nossa IA analisa seu site em minutos e entrega um relatório completo com os pontos que estão sabotando suas vendas — de graça, sem enrolação.
+      </p>
+
+      <div class="trust-pills">
+        <div class="pill">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Diagnóstico gratuito
+        </div>
+        <div class="pill">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#a78bfa" stroke-width="2"/><path stroke="#a78bfa" stroke-width="2" stroke-linecap="round" d="M12 7v5l3 3"/></svg>
+          Resultado em 30 minutos
+        </div>
+        <div class="pill">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+          Relatório em PDF
+        </div>
+      </div>
+
+      <p class="benefits-title">O que você vai descobrir</p>
+
+      <div class="benefit-item">
+        <div class="benefit-icon">🔍</div>
+        <div class="benefit-text">
+          <strong>Problemas de conversão</strong>
+          <span>Identifique onde os visitantes abandonam o funil e o que os impede de comprar.</span>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-icon">🛒</div>
+        <div class="benefit-text">
+          <strong>Fricção no checkout</strong>
+          <span>Descubra os obstáculos técnicos e de UX que aumentam o abandono de carrinho.</span>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-icon">📱</div>
+        <div class="benefit-text">
+          <strong>Experiência mobile</strong>
+          <span>Saiba se seu site está perdendo vendas para usuários de celular — hoje maioria do tráfego.</span>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-icon">⚡</div>
+        <div class="benefit-text">
+          <strong>Performance e velocidade</strong>
+          <span>Cada segundo a mais de carregamento pode custar até 7% nas suas conversões.</span>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-icon">🎯</div>
+        <div class="benefit-text">
+          <strong>Plano de ação prioritizado</strong>
+          <span>Receba um checklist com o que corrigir primeiro para gerar impacto imediato no faturamento.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: FORM -->
+    <div class="hero-right">
+      <div class="form-card">
+
+        <!-- FORM STATE -->
+        <div id="state-form" class="state active">
+          <div class="form-header">
+            <h2>Quero meu diagnóstico grátis</h2>
+            <p>Preencha os dados abaixo e receba em até 30 min</p>
+          </div>
+
+          <form id="audit-form" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="lead_name">Seu nome completo</label>
+              <input id="lead_name" name="lead_name" type="text" placeholder="João Silva" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="lead_email">E-mail</label>
+              <input id="lead_email" name="lead_email" type="email" placeholder="joao@sualoja.com.br" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="lead_phone">WhatsApp / Telefone</label>
+              <input id="lead_phone" name="lead_phone" type="tel" placeholder="(11) 99999-9999" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="url">URL do seu e-commerce</label>
+              <input id="url" name="url" type="url" placeholder="https://sualoja.com.br" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="revenue_range">Faturamento mensal médio</label>
+              <select id="revenue_range" name="revenue_range" required>
+                <option value="" disabled selected>Selecione uma faixa</option>
+                <option value="20k-50k">Até R$50k/mês</option>
+                <option value="50k-100k">R$50k a R$100k/mês</option>
+                <option value="100k+">Acima de R$100k/mês</option>
+              </select>
+            </div>
+
+            <div id="error-msg" class="error-msg"></div>
+
+            <button type="submit" class="btn-submit" id="btn-submit">
+              <span id="btn-text">Gerar meu diagnóstico grátis →</span>
+              <div class="spinner" id="spinner" style="display:none;"></div>
+            </button>
+
+            <p class="micro-trust">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#475569" stroke-width="2"/><path stroke="#475569" stroke-width="2" stroke-linecap="round" d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Seus dados estão seguros. Sem spam, prometemos.
+            </p>
+          </form>
+        </div>
+
+        <!-- SUCCESS STATE -->
+        <div id="state-success" class="state">
+          <div class="success-box">
+            <div class="success-icon">✅</div>
+            <p class="success-title">Diagnóstico em andamento!</p>
+            <p class="success-msg">
+              Seu diagnóstico está sendo gerado! Em até <strong>30 minutos</strong> você receberá seu relatório completo no e-mail informado.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STATS -->
+  <div class="divider"></div>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number">+300</div>
+      <div class="stat-label">E-commerces analisados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">87%</div>
+      <div class="stat-label">Identificam gargalo na 1ª auditoria</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">30min</div>
+      <div class="stat-label">Tempo médio de entrega</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 HeyCommerce · <a href="mailto:contato@heycommerce.com.br">contato@heycommerce.com.br</a></p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('audit-form');
+    var btnSubmit = document.getElementById('btn-submit');
+    var btnText = document.getElementById('btn-text');
+    var spinner = document.getElementById('spinner');
+    var errorMsg = document.getElementById('error-msg');
+    var stateForm = document.getElementById('state-form');
+    var stateSuccess = document.getElementById('state-success');
+
+    // Phone mask
+    var phoneInput = document.getElementById('lead_phone');
+    phoneInput.addEventListener('input', function () {
+      var v = this.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length <= 2) { this.value = v.length ? '(' + v : v; }
+      else if (v.length <= 6) { this.value = '(' + v.slice(0,2) + ') ' + v.slice(2); }
+      else if (v.length <= 10) { this.value = '(' + v.slice(0,2) + ') ' + v.slice(2,6) + '-' + v.slice(6); }
+      else { this.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7); }
+    });
+
+    // URL auto-prefix
+    var urlInput = document.getElementById('url');
+    urlInput.addEventListener('blur', function () {
+      var v = this.value.trim();
+      if (v && !v.match(/^https?:\/\//i)) {
+        this.value = 'https://' + v;
+      }
+    });
+
+    function setLoading(loading) {
+      btnSubmit.disabled = loading;
+      btnText.style.display = loading ? 'none' : 'inline';
+      spinner.style.display = loading ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+    }
+
+    function hideError() {
+      errorMsg.classList.remove('visible');
+      errorMsg.textContent = '';
+    }
+
+    function showSuccess() {
+      stateForm.classList.remove('active');
+      stateSuccess.classList.add('active');
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideError();
+
+      var name = document.getElementById('lead_name').value.trim();
+      var email = document.getElementById('lead_email').value.trim();
+      var phone = document.getElementById('lead_phone').value.trim();
+      var url = document.getElementById('url').value.trim();
+      var revenueRange = document.getElementById('revenue_range').value;
+
+      if (!name || !email || !phone || !url || !revenueRange) {
+        showError('Por favor, preencha todos os campos antes de continuar.');
+        return;
+      }
+
+      // Basic email check
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('Por favor, informe um e-mail válido.');
+        return;
+      }
+
+      // Basic URL check
+      try { new URL(url); } catch (_) {
+        showError('Por favor, informe uma URL válida (ex: https://sualoja.com.br).');
+        return;
+      }
+
+      setLoading(true);
+
+      var payload = {
+        url: url,
+        lead_name: name,
+        lead_email: email,
+        lead_phone: phone,
+        revenue_range: revenueRange,
+        source: 'landing'
+      };
+
+      try {
+        var res = await fetch('https://ecommerce-audit-engine.onrender.com/audits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          var body = null;
+          try { body = await res.json(); } catch (_) {}
+          var detail = (body && body.message) ? body.message : 'Tente novamente em alguns instantes.';
+          showError('Ops! Algo deu errado: ' + detail);
+          setLoading(false);
+          return;
+        }
+
+        showSuccess();
+      } catch (err) {
+        showError('Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.');
+        setLoading(false);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
