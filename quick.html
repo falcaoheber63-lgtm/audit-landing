@@ -413,7 +413,7 @@
       const res = await fetch(API + '/audits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, source: 'landing-quick' })
+        body: JSON.stringify({ url, source: 'landing' })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao criar auditoria');
