@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>HeyCommerce – Diagnóstico Gratuito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0f172a;
+      --navy-light: #1e293b;
+      --purple: #7c3aed;
+      --purple-light: #8b5cf6;
+      --purple-glow: #a78bfa;
+      --white: #ffffff;
+      --gray: #94a3b8;
+      --gray-light: #cbd5e1;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--navy);
+      font-family: 'Inter', sans-serif;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    /* Background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: rgba(124,58,237,0.15);
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: rgba(124,58,237,0.1);
+      bottom: -80px; right: -80px;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(30,41,59,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.4);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: var(--purple-glow);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, var(--purple-glow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    /* ── FORM STATE ── */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      width: 18px; height: 18px;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      background: rgba(15,23,42,0.6);
+      border: 1.5px solid rgba(124,58,237,0.2);
+      border-radius: 12px;
+      padding: 16px 16px 16px 46px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="url"]::placeholder { color: var(--gray); }
+    input[type="url"]:focus { border-color: var(--purple-light); }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--purple), #6d28d9);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.4);
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,0.5); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      display: none;
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── LOADING STATE ── */
+    #state-loading { display: none; text-align: center; }
+
+    .spinner {
+      width: 56px; height: 56px;
+      border: 3px solid rgba(124,58,237,0.2);
+      border-top-color: var(--purple-light);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .loading-sub {
+      color: var(--gray);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .steps {
+      margin-top: 28px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--gray);
+      transition: color 0.3s;
+    }
+    .step.active { color: var(--white); }
+    .step.done { color: var(--green); }
+
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(124,58,237,0.3);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .step.active .step-dot { background: var(--purple-light); animation: pulse 1s ease-in-out infinite; }
+    .step.done .step-dot { background: var(--green); animation: none; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ── SUCCESS STATE ── */
+    #state-success { display: none; text-align: center; }
+
+    .check-circle {
+      width: 72px; height: 72px;
+      background: rgba(16,185,129,0.1);
+      border: 2px solid rgba(16,185,129,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .check-circle svg { color: var(--green); width: 32px; height: 32px; }
+
+    .success-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .success-sub {
+      color: var(--gray);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--green), #059669);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-download:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,0.4); }
+    @keyframes pop-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .score-badge {
+      display: inline-block;
+      margin-top: 20px;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 14px;
+      color: var(--purple-glow);
+      font-weight: 600;
+    }
+
+    .btn-new {
+      margin-top: 20px;
+      background: none;
+      border: 1px solid rgba(124,58,237,0.3);
+      color: var(--gray);
+      font-size: 13px;
+      font-family: inherit;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-new:hover { color: var(--white); border-color: var(--purple-light); }
+
+    /* ── ERROR STATE ── */
+    #state-error { display: none; text-align: center; }
+    .error-circle {
+      width: 64px; height: 64px;
+      background: rgba(239,68,68,0.1);
+      border: 2px solid rgba(239,68,68,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+    }
+    .error-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .error-detail { color: var(--gray); font-size: 14px; margin-bottom: 24px; }
+
+    @media (max-width: 560px) {
+      .card { padding: 32px 24px; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- ── FORM ── -->
+  <div id="state-form">
+    <div class="badge">✦ Gratuito &amp; Instantâneo</div>
+    <h1>Descubra o score da sua loja</h1>
+    <p class="subtitle">Cole o link da sua loja abaixo. Em minutos, seu relatório completo estará pronto para baixar.</p>
+
+    <div class="input-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+      </svg>
+      <input type="url" id="store-url" placeholder="https://sualojaexemplo.com.br" autocomplete="off" spellcheck="false"/>
+    </div>
+    <p class="error-msg" id="url-error">Por favor, insira uma URL válida (ex: https://sualoja.com.br)</p>
+
+    <button class="btn" id="btn-submit" onclick="startAudit()">
+      Gerar diagnóstico grátis →
+    </button>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div id="state-loading">
+    <div class="spinner"></div>
+    <p class="loading-title">Analisando sua loja...</p>
+    <p class="loading-sub">Navegando pelas páginas, capturando dados e gerando o relatório com IA.</p>
+    <div class="steps">
+      <div class="step active" id="step-1"><div class="step-dot"></div> Acessando homepage e categorias</div>
+      <div class="step" id="step-2"><div class="step-dot"></div> Analisando página de produto e carrinho</div>
+      <div class="step" id="step-3"><div class="step-dot"></div> Avaliando checkout e meios de pagamento</div>
+      <div class="step" id="step-4"><div class="step-dot"></div> Calculando score e gerando PDF</div>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS ── -->
+  <div id="state-success">
+    <div class="check-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+    <p class="success-title">Seu diagnóstico está pronto! 🎉</p>
+    <p class="success-sub">Analisamos sua loja e identificamos os principais pontos que impactam sua conversão.</p>
+    <a id="btn-download" href="#" target="_blank" class="btn-download">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      </svg>
+      Baixar Relatório em PDF
+    </a>
+    <br/>
+    <div class="score-badge" id="score-display"></div>
+    <br/>
+    <button class="btn-new" onclick="resetForm()">← Analisar outra loja</button>
+  </div>
+
+  <!-- ── ERROR ── -->
+  <div id="state-error">
+    <div class="error-circle">⚠️</div>
+    <p class="error-title">Algo deu errado</p>
+    <p class="error-detail" id="error-detail">Não foi possível gerar o diagnóstico. Tente novamente.</p>
+    <button class="btn" onclick="resetForm()">Tentar novamente</button>
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://ecommerce-audit-engine.onrender.com';
+  let pollInterval = null;
+  let stepTimer = null;
+  let currentStep = 1;
+
+  function show(id) {
+    ['state-form','state-loading','state-success','state-error'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? 'block' : 'none';
+    });
+  }
+
+  function advanceStep() {
+    if (currentStep < 4) {
+      document.getElementById('step-' + currentStep).className = 'step done';
+      currentStep++;
+      document.getElementById('step-' + currentStep).className = 'step active';
+    }
+  }
+
+  async function startAudit() {
+    const urlInput = document.getElementById('store-url');
+    const errEl = document.getElementById('url-error');
+    const url = urlInput.value.trim();
+
+    // Basic URL validation
+    try { new URL(url); } catch {
+      errEl.classList.add('visible');
+      urlInput.focus();
+      return;
+    }
+    if (!url.startsWith('http')) {
+      errEl.classList.add('visible');
+      urlInput.focus();
+      return;
+    }
+    errEl.classList.remove('visible');
+
+    document.getElementById('btn-submit').disabled = true;
+
+    // Submit to API
+    let auditId;
+    try {
+      const res = await fetch(API + '/audits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, source: 'landing-quick' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao criar auditoria');
+      auditId = data.audit_id;
+    } catch (err) {
+      showError(err.message);
+      return;
+    }
+
+    // Show loading
+    currentStep = 1;
+    ['step-1','step-2','step-3','step-4'].forEach(id => {
+      document.getElementById(id).className = 'step';
+    });
+    document.getElementById('step-1').className = 'step active';
+    show('state-loading');
+
+    // Advance steps visually every ~45s (typical audit takes 3-8min)
+    stepTimer = setInterval(advanceStep, 45000);
+
+    // Poll for result every 10s
+    pollInterval = setInterval(() => pollAudit(auditId), 10000);
+  }
+
+  async function pollAudit(auditId) {
+    try {
+      const res = await fetch(API + '/audits/' + auditId);
+      const data = await res.json();
+
+      if (data.status === 'completed' && data.pdf_url) {
+        clearInterval(pollInterval);
+        clearInterval(stepTimer);
+        showSuccess(data.pdf_url, data.overall_score);
+      } else if (data.status === 'failed') {
+        clearInterval(pollInterval);
+        clearInterval(stepTimer);
+        showError(data.error_message || 'A auditoria falhou. Tente novamente.');
+      }
+    } catch {
+      // Network error during poll — keep trying
+    }
+  }
+
+  function showSuccess(pdfUrl, score) {
+    document.getElementById('btn-download').href = pdfUrl;
+    const scoreEl = document.getElementById('score-display');
+    if (score != null) {
+      const label = score >= 70 ? '😊 Bom' : score >= 50 ? '😐 Regular' : '😟 Precisa melhorar';
+      scoreEl.textContent = `Score geral: ${score}/100 — ${label}`;
+      scoreEl.style.display = 'inline-block';
+    } else {
+      scoreEl.style.display = 'none';
+    }
+    show('state-success');
+  }
+
+  function showError(msg) {
+    clearInterval(pollInterval);
+    clearInterval(stepTimer);
+    document.getElementById('error-detail').textContent = msg;
+    document.getElementById('btn-submit').disabled = false;
+    show('state-error');
+  }
+
+  function resetForm() {
+    clearInterval(pollInterval);
+    clearInterval(stepTimer);
+    document.getElementById('store-url').value = '';
+    document.getElementById('btn-submit').disabled = false;
+    show('state-form');
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('store-url').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startAudit();
+  });
+</script>
+</body>
+</html>
